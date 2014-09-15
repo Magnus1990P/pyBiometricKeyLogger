@@ -87,8 +87,6 @@ class Application( QWidget ):
 		self.I_TXT.returnPressed.connect( self.commitLine )
 		
 	def commitLine( self ):
-		global FILEH
-		FILEH.write( self.I_TXT.text().encode("utf-8") + "\n" )
 		self.W_TXT.append(	"<b>SYS: </b><font color='green'>"	+ 
 												self.LINES[ self.LINE ][:-1]	+ 
 												"</font>\n" )
