@@ -64,7 +64,7 @@ class Application( QWidget ):
 		self.I_TXT.setFont( self.FONT )
 		self.I_TXT.setReadOnly(True)
 
-		self.U_TXT	= QLineEdit( "JØACKSON".decode("utf-8") )	#Input text box
+		self.U_TXT	= QLineEdit( "USERNAME".decode("utf-8") )	#Input text box
 		self.U_TXT.setFont( self.FONT )
 
 		self.CONT		= QVBoxLayout( )
@@ -134,11 +134,11 @@ class Application( QWidget ):
 		global T_END, STATE, FILEH
 		if STATE == True:
 			T_END = getTime( T_START )
-			STATE = False
 			self.S_TXT.clear()
 			self.I_TXT.clear()
 			self.I_TXT.setReadOnly(True)
 			self.START.setEnabled(True)
+			STATE = False
 			FILEH.write( str(len( self.OLINES )) + "\n" )
 			for l in self.OLINES:
 				FILEH.write( l.encode("utf-8") + "\n" )
