@@ -9,7 +9,7 @@ import	MySQLdb
 HOST		= "127.0.0.1"
 USER		= "root"
 PASSWD	= "toor"
-DB			= "quest"
+DB			= "pyKeyLog"
 
 
 def getSampleText( fname ):
