@@ -55,6 +55,8 @@ for arg in sys.argv[1:]:
 
 	NLINES= FILEH.readline().decode("utf-8")
 	NLINES=int(NLINES)
+	ATEXT = ""
+	OTEXT = ""
 	for i in range(NLINES):
 		ATEXT = ATEXT + FILEH.readline().decode("utf-8")
 	
