@@ -54,12 +54,18 @@ def getTimes( S ):
 	STACK = {}
 	iTime = 0
 	aTime = 0
-	pTime = 0
+	pTime = -1
 	yTime = 10**10
 	xTime = 0
+	bSpaces = 0
+	kdEvents = 0
 
 	for e in S: #Key UP
+		if(pTime == -1):
+			pTime = e["ms"]
+		
 		if e["type"]==1 and e["ascii"] in STACK:#If down event on stack
+			kdEvents += 1
 			del STACK[ e["ascii"] ]		#delete it from the stack
 
 			if len(STACK) == 0:										#checks if stack is empty
@@ -67,10 +73,12 @@ def getTimes( S ):
 				pTime = e["ms"]											#update previous Time
 
 		else:	#KeyDown
-			if len(STACK) == 0:										#If stack is empty
+			STACK.update({e["ascii"]:e['aid']})	#add ascii val to stack
+			if len(STACK) == 1:										#If stack is empty
 				iTime = iTime + ( e["ms"] - pTime )	#increment idle time
-				STACK.update({e["ascii"]:e['aid']})	#add ascii val to stack
 				pTime = e["ms"]											#update previous Time
+			if(e["title"] == "BackSpace"):
+				bSpaces += 1
 
 		if yTime > e["ms"]:		#Get start Time
 			yTime = e['ms']
@@ -79,12 +87,45 @@ def getTimes( S ):
 			xTime = e['ms']
 	
 	#return active, idle, start, end, total write time
-	return aTime, iTime, yTime, xTime, (xTime - yTime)
+	return aTime, iTime, yTime, xTime, (xTime - yTime), bSpaces, kdEvents
+
+def correctness(submit, answer):
+	tota = 0
+	tots = 0
+	for s, a in zip(submit.split("\\n"), answer.split("\\n")):
+		c = 0 
+		w = 0
+		words = {}
+		for word in a.split(" "):
+			words[re.sub("[^a-zA-Z]", "", word)] = 1
+			tota += 1
+		
+		for word in s.split(" "):
+			word = re.sub("[^a-zA-Z]", "", word)
+			tots += 1
+			if(word in words):
+				c += 1
+			else:
+				w += 1
+			
+	return c, w, tota, tots
 
 basics()
+u = ""
+if "csv" in sys.argv:
+	print "Timestamp, Active, Inactive, Ratio, BackSpace, KeyDownEvents, Start, End, TotalTime, Correct, Wrong, TotalWords, TotalWordsTyped"
 for session in SESSIONS:
 	session.update({"events":getKeys(session["aid"])})
-	a, i, s, e, t = getTimes( session["events"] )
-	print session['uname'], session["start"],
-	print a/10**6, i/10**6, s/10**6, e/10**6, t/10**6
+	a, i, s, e, t, bs, kd = getTimes( session["events"] )
+	c, w, tota, tots = correctness(session['submit'], session['text'])
+	if(session['uname'] != u):
+		print session['uname']
+		u = session['uname']
+	if "csv" in sys.argv:
+		fo = "%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d"
+	else:
+		fo = "%s a:%d\t i:%d\tr:%d%%\tbs:%d\tkd:%d\ts:%d\te:%d\ttot:%d\tc:%d\tw:%d\ttota:%d\ttots:%d\t"
+	
+	
+	print fo % (session["start"], a/10**3, i/10**3, (((a/10**3)*100)/(t/10**3)), bs, kd, s/10**3, e/10**3, t/10**3, c, w, tota, tots)
 
